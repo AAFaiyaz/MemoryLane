@@ -1,4 +1,7 @@
 <?php
+//Start the session
+session_start();
+
 $conn = mysqli_connect("localhost","root","","memoryLane");
 if (mysqli_connect_errno()){
     echo "Failed to connect". mysqli_connect_errno();
@@ -23,26 +26,31 @@ if(isset($_POST['register_button'])){
     $fname = strip_tags($_POST['reg_fname']); //replace html tags
     $fname = str_replace(' ','',$fname); //remove spaces
     $fname = ucfirst(strtolower($fname)); //Capitalize First Letter
+    $_SESSION['reg_fname'] = $fname; //Stores first name into session variable
 
     //Middle Name
     $mname = strip_tags($_POST['reg_mname']); //replace html tags
     $mname = str_replace(' ','',$mname); //remove spaces
     $mname = ucfirst(strtolower($mname)); //Capitalize First Letter
+    $_SESSION['reg_mname'] = $mname; //Stores middle name into session
 
     //Last Name
     $lname = strip_tags($_POST['reg_lname']); //replace html tags
     $lname = str_replace(' ','',$lname); //remove spaces
     $lname = ucfirst(strtolower($lname)); //Capitalize First Letter
+    $_SESSION['reg_lname'] = $lname; //Sores last name into session variables
 
     //Email
     $email = strip_tags($_POST['reg_email']); //replace html tags
     $email = str_replace(' ','',$email); //remove spaces
     $email = ucfirst(strtolower($email)); //Capitalize First Letter
+    $_SESSION['reg_email'] = $email; //Stores email into session variable
 
     //Email2
     $email2 = strip_tags($_POST['reg_email2']); //replace html tags
     $email2 = str_replace(' ','',$email2); //remove spaces
     $email2 = ucfirst(strtolower($email2)); //Capitalize First Letter
+    $_SESSION['reg_email2'] = $email2; //Stores email2 into session variable
 
     //password
     $password = strip_tags($_POST['reg_password']); //replace html tags
@@ -65,38 +73,38 @@ if(isset($_POST['register_button'])){
             $num_rows = mysqli_num_rows($e_check);
 
             if($num_rows > 0){
-                echo "Email already exist.<br>";
+                array_push($errors_array,"Email already exist.<br>");
             }
         }else{
-            echo "Sorry! Invalid Email Format! <br>";
+            array_push($errors_array,"Sorry! Invalid Email Format! <br>");
         }
 
     } else {
-        echo "Emails don't match. <br>";
+        array_push($errors_array,"Emails don't match. <br>");
     }
 
     if (strlen($fname) > 25 || strlen($fname) < 2){
-        echo "Your First Name must be between 2 and 25 chracters <br>";
+        array_push($errors_array,"Your First Name must be between 2 and 25 chracters <br>");
     }
 
     if (strlen($mname) > 25 || strlen($mname) < 2){
-        echo "Your Middle Name must be between 2 and 25 chracters <br>";
+        array_push($errors_array,"Your Middle Name must be between 2 and 25 chracters <br>");
     }
 
     if (strlen($lname) > 25 || strlen($lname) < 2){
-        echo "Your Last Name must be between 2 and 25 chracters <br>";
+        array_push($errors_array,"Your Last Name must be between 2 and 25 chracters <br>");
     }
 
     if ($password != $password2) {
-        echo "Your Password doesn't match <br>";
+        array_push($errors_array,"Your Password doesn't match <br>");
     } else {
         if(preg_match('/[^A-Za-z0-9]/', $password)){ //Password should be contains these character A-Z,a-z,0-9
-            echo "Your password can only contain english chracters or number <br>";
+            array_push($errors_array,"Your password can only contain english chracters or number <br>");
         }
     }
 
     if(strlen($password > 30 || strlen($password) <5)){
-        echo "Your password must be between 5 and 30 characters <br>";
+        array_push($errors_array,"Your password must be between 5 and 30 characters <br>");
     }
     
 }
@@ -115,20 +123,45 @@ if(isset($_POST['register_button'])){
 </head>
 <body>
     <form action="register.php" method="post">
-        <input type="text" name="reg_fname" placeholder="First Name" required>
+        <input type="text" name="reg_fname" placeholder="First Name" value="<?php if(isset($_SESSION['reg_fname'])) echo $_SESSION['reg_fname']; ?>" required>
         <br>
-        <input type="text" name="reg_lname" placeholder="Last Name" required>
+        <?php if(in_array("Your First Name must be between 2 and 25 chracters <br>",$errors_array)) echo "Your First Name must be between 2 and 25 chracters <br>";?>
+
+        <input type="text" name="reg_mname" placeholder="Middle Name" value="<?php if(isset($_SESSION['reg_mname'])) echo $_SESSION['reg_mname']; ?>" required>
         <br>
-        <input type="text" name="reg_mname" placeholder="Middle Name" required>
+        <?php if(in_array("Your Middle Name must be between 2 and 25 chracters <br>",$errors_array)) echo "Your Middle Name must be between 2 and 25 chracters <br>";?>
+
+        <input type="text" name="reg_lname" placeholder="Last Name" value="<?php if(isset($_SESSION['reg_lname'])) echo $_SESSION['reg_lname']; ?>" required>
         <br>
-        <input type="email" name="reg_email" placeholder="Email" required>
+        <?php if(in_array("Your Last Name must be between 2 and 25 chracters <br>",$errors_array)) echo "Your Last Name must be between 2 and 25 chracters <br>";?>
+
+        <input type="email" name="reg_email" placeholder="Email" value="<?php if(isset($_SESSION['reg_email'])) echo $_SESSION['reg_email']; ?>" required>
         <br>
-        <input type="email" name="reg_email2" placeholder="Confirm Email" required>
+        <?php  ?>
+
+        <input type="email" name="reg_email2" placeholder="Confirm Email" value="<?php if(isset($_SESSION['reg_email2'])) echo $_SESSION['reg_email2']; ?>" required>
         <br>
+        <?php 
+        if(in_array("Email already exist.<br>",$errors_array)) echo "Email already exist.<br>";
+        else if(in_array("Sorry! Invalid Email Format! <br>",$errors_array)) echo "Sorry! Invalid Email Format! <br>";
+        else if(in_array("Emails don't match. <br>",$errors_array)) echo "Emails don't match. <br>";?>
+
+
         <input type="password" name="reg_password" placeholder="Password" required>
         <br>
+        
+        
+
         <input type="password" name="reg_password2" placeholder="Confirm Password" required>
         <br>
+        <?php
+        
+        if(in_array("Your Password doesn't match <br>",$errors_array)) echo "Your Password doesn't match <br>";
+        
+        else if(in_array("Your password can only contain english chracters or number <br>",$errors_array)) echo "Your password can only contain english chracters or number <br>";
+        else if(in_array("Your password must be between 5 and 30 characters <br>",$errors_array)) echo "Your password must be between 5 and 30 characters <br>";
+        ?>
+
         <input type="submit" name="register_button" value="Sign-Up">
         <br>
     </form>
