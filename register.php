@@ -38,7 +38,7 @@ if(isset($_POST['register_button'])){
     $lname = strip_tags($_POST['reg_lname']); //replace html tags
     $lname = str_replace(' ','',$lname); //remove spaces
     $lname = ucfirst(strtolower($lname)); //Capitalize First Letter
-    $_SESSION['reg_lname'] = $lname; //Sores last name into session variables
+    $_SESSION['reg_lname'] = $lname; //Stores last name into session variables
 
     //Email
     $email = strip_tags($_POST['reg_email']); //replace html tags
@@ -102,9 +102,43 @@ if(isset($_POST['register_button'])){
             array_push($errors_array,"Your password can only contain english chracters or number <br>");
         }
     }
-
-    if(strlen($password > 30 || strlen($password) <5)){
+    if(strlen($password) > 30 || strlen($password) < 5){
         array_push($errors_array,"Your password must be between 5 and 30 characters <br>");
+    }
+   
+    if(empty($errors_array)){
+        $password = md5($password); //Encrypting password before sending to database
+        //Generate username by concatenating with first middle and last name
+        $username = strtolower($fname . "_" .$mname. "_". $lname);
+        $check_username_query = mysqli_query($conn, "SELECT username FROM users WHERE username='$username'");
+
+        $i = 0;
+        while(mysqli_num_rows($check_username_query) !=0){
+            $i++;
+            $username = $username ."_". $i;
+            $check_username_query = mysqli_query($conn,"SELECT username FROM users WHERE username='$username'");
+        }
+        //We have to use while loop here
+
+        //Profile Picture assignment
+        $rand = rand(1,2); //Random number between 1 and 2;
+        if ($rand == 1){
+            $profile_pic = "assets/images/profile_pics/defaults/head_deep_blue.png";
+        } else{
+            $profile_pic = "assets/images/profile_pics/defaults/head_emerald.png";
+        }
+        
+        $query = mysqli_query($conn, "INSERT INTO users VALUES ('','$fname','$mname','$lname','$username','$email', '$password', '$date', '$profile_pic', '0', '0', 'no', ',')"); 
+
+        array_push($errors_array,"<span style='color: #14C800;'>You are all set ! Go ahead and login!</span><br>");
+
+        //Clear Session variables
+        $_SESSION['reg_fname'] = "";
+        $_SESSION['reg_mname'] = "";
+        $_SESSION['reg_lname'] = "";
+        $_SESSION['reg_email'] = "";
+        $_SESSION['reg_email2'] = "";
+
     }
     
 }
@@ -150,8 +184,6 @@ if(isset($_POST['register_button'])){
         <input type="password" name="reg_password" placeholder="Password" required>
         <br>
         
-        
-
         <input type="password" name="reg_password2" placeholder="Confirm Password" required>
         <br>
         <?php
@@ -164,6 +196,9 @@ if(isset($_POST['register_button'])){
 
         <input type="submit" name="register_button" value="Sign-Up">
         <br>
+        <?php
+            if(in_array("<span style='color: #14C800;'>You are all set ! Go ahead and login!</span><br>",$errors_array)) echo "<span style='color: #14C800;'>You are all set ! Go ahead and login!</span><br>";
+        ?>
     </form>
 </body>
 </html>
