@@ -1,11 +1,6 @@
 <?php
 
-$conn = mysqli_connect("localhost","root","","memoryLane");
-
-if(mysqli_connect_errno()){
-    echo "Failed to connect".mysqli_connect_errno(); 
-}
-$query = mysqli_query($conn,"INSERT INTO users VALUES('','FAiyaz')");
+require 'config/config.php';
 
 ?>
 
