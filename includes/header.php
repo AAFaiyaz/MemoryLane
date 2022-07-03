@@ -3,6 +3,8 @@ require 'config/config.php';
 
 if(isset($_SESSION['username'])){
     $userLoggedIn = $_SESSION['username'];
+    $user_details_query = mysqli_query($conn, "SELECT * FROM users WHERE username='$userLoggedIn'");
+    $user = mysqli_fetch_array($user_details_query);
 } else {
     header("Location: register.php");
 }
@@ -18,6 +20,7 @@ if(isset($_SESSION['username'])){
     <title>Welcome to MemoryLane</title>
 
     <!-- JavaScript -->
+    <script src="https://kit.fontawesome.com/7425c3ab84.js" crossorigin="anonymous"></script>
     <script src="assets/js/bootstrap.js"></script>
     <script src="assets/js/bootstrap.bundle.js"></script>
     <!-- CSS -->
@@ -32,5 +35,28 @@ if(isset($_SESSION['username'])){
   <div class="logo">
     <a href="index.php">MemoryLane</a>
   </div>
+  <nav>
+    <a href="#">
+      <?php echo $user['first_name'] ?>
+    </a>
+    <a href="#">
+      <i class="fa-solid fa-envelope"></i>
+    </a>
+    <a href="#">
+      <i class="fa-solid fa-house-chimney"></i>
+    </a>
+    <a href="#">
+      <i class="fa-solid fa-bell"></i>
+    </a>
+    <a href="#">
+    <i class="fa-solid fa-users"></i>
+    </a>
+    <a href="#">
+    <i class="fa-solid fa-gear"></i>
+    </a>
+    <a href="#">
+    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+    </a>
+  </nav>
 </div>
     
