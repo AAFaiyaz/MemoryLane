@@ -60,3 +60,5 @@ if(isset($_SESSION['username'])){
   </nav>
 </div>
     
+<div class="wrapper">
+
